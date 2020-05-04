@@ -23,9 +23,12 @@ func (p *Pool) Put(server *Server) {
 }
 
 func (p *Pool) GetNext() *Server {
+	defer p.mux.Unlock()
 	p.mux.Lock()
-	el := p.servers.Front()
-	p.servers.MoveToBack(el)
-	p.mux.Unlock()
-	return el.Value.(*Server)
+
+	if el := p.servers.Front(); el != nil {
+		p.servers.MoveToBack(el)
+		return el.Value.(*Server)
+	}
+	return nil
 }
