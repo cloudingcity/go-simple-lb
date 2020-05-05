@@ -34,7 +34,7 @@ func TestServer_IsAlive(t *testing.T) {
 	assert.NoError(t, err)
 
 	u, _ := url.Parse("http://0.0.0.0:1234")
-	server := &Server{URL: u}
+	server := &Server{serverURL: u}
 	assert.True(t, server.IsAlive())
 
 	ln.Close()

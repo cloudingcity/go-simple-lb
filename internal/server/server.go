@@ -9,14 +9,14 @@ import (
 )
 
 type Server struct {
-	URL     *url.URL
-	handler http.Handler
+	serverURL *url.URL
+	handler   http.Handler
 }
 
-func NewServer(serverURL *url.URL) *Server {
+func NewServer(u *url.URL) *Server {
 	return &Server{
-		URL:     serverURL,
-		handler: httputil.NewSingleHostReverseProxy(serverURL),
+		serverURL: u,
+		handler:   httputil.NewSingleHostReverseProxy(u),
 	}
 }
 
@@ -25,6 +25,6 @@ func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) IsAlive() bool {
-	_, err := net.DialTimeout("tcp", s.URL.Host, 1*time.Second)
+	_, err := net.DialTimeout("tcp", s.serverURL.Host, 1*time.Second)
 	return err == nil
 }

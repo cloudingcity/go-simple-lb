@@ -12,9 +12,9 @@ func TestPool_GetNext(t *testing.T) {
 		u1, _ := url.Parse("http://example1.com")
 		u2, _ := url.Parse("http://example2.com")
 		u3, _ := url.Parse("http://example3.com")
-		s1 := &Server{URL: u1}
-		s2 := &Server{URL: u2}
-		s3 := &Server{URL: u3}
+		s1 := &Server{serverURL: u1}
+		s2 := &Server{serverURL: u2}
+		s3 := &Server{serverURL: u3}
 
 		pool := NewPool()
 		pool.Put(s1)
