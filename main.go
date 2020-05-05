@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"time"
 
 	"github.com/cloudingcity/go-simple-lb/internal/proxy"
 	"github.com/cloudingcity/go-simple-lb/internal/utils"
@@ -26,5 +27,6 @@ func main() {
 	for _, serverURL := range flagURL.URLs {
 		lb.Add(serverURL)
 	}
+	go lb.HeathCheck(1 * time.Minute)
 	lb.Listen(port)
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net"
 	"net/url"
 	"testing"
 
@@ -29,4 +30,31 @@ func TestPool_GetNext(t *testing.T) {
 		pool := NewPool()
 		assert.Nil(t, pool.GetNext())
 	})
+}
+
+func TestPool_HealthCheck(t *testing.T) {
+	u1, _ := url.Parse("http://0.0.0.0:1234")
+	u2, _ := url.Parse("http://0.0.0.0:1235")
+	u3, _ := url.Parse("http://0.0.0.0:1236")
+	s1 := &Server{serverURL: u1}
+	s2 := &Server{serverURL: u2}
+	s3 := &Server{serverURL: u3}
+
+	pool := NewPool()
+	pool.Put(s1)
+	pool.Put(s2)
+	pool.Put(s3)
+
+	pool.HealthCheck()
+	assert.Equal(t, 0, pool.servers.Len())
+	assert.Equal(t, 3, pool.downServers.Len())
+
+	ln, err := net.Listen("tcp4", ":1234")
+	assert.NoError(t, err)
+
+	pool.HealthCheck()
+	assert.Equal(t, 1, pool.servers.Len())
+	assert.Equal(t, 2, pool.downServers.Len())
+
+	ln.Close()
 }

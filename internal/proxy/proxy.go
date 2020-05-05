@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/cloudingcity/go-simple-lb/internal/server"
 	log "github.com/sirupsen/logrus"
@@ -26,6 +27,21 @@ func (lb *LoadBalancer) Add(u *url.URL) {
 
 func (lb *LoadBalancer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	lb.serverPool.GetNext().ServeHTTP(w, req)
+}
+
+func (lb *LoadBalancer) HeathCheck(d time.Duration) {
+	t := time.NewTicker(d)
+	for {
+		select {
+		case <-t.C:
+			log.Println("Health check starting...")
+			msgs := lb.serverPool.HealthCheck()
+			for _, msg := range msgs {
+				log.Warn(msg)
+			}
+			log.Println("Health check completed")
+		}
+	}
 }
 
 func (lb *LoadBalancer) Listen(port int) {
