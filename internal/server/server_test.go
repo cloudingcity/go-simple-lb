@@ -30,10 +30,10 @@ func TestServer_ServeHTTP(t *testing.T) {
 }
 
 func TestServer_IsAlive(t *testing.T) {
-	ln, err := net.Listen("tcp4", ":1234")
+	ln, err := net.Listen("tcp4", "localhost:1234")
 	assert.NoError(t, err)
 
-	u, _ := url.Parse("http://0.0.0.0:1234")
+	u, _ := url.Parse("http://localhost:1234")
 	server := &Server{url: u}
 	assert.True(t, server.IsAlive())
 

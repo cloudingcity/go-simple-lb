@@ -31,16 +31,13 @@ func (lb *LoadBalancer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (lb *LoadBalancer) HeathCheck(d time.Duration) {
 	t := time.NewTicker(d)
-	for {
-		select {
-		case <-t.C:
-			log.Println("Health check starting...")
-			msgs := lb.serverPool.HealthCheck()
-			for _, msg := range msgs {
-				log.Warn(msg)
-			}
-			log.Println("Health check completed")
+	for range t.C {
+		log.Println("Health check starting...")
+		msgs := lb.serverPool.HealthCheck()
+		for _, msg := range msgs {
+			log.Warn(msg)
 		}
+		log.Println("Health check completed")
 	}
 }
 

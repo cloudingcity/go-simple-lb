@@ -33,9 +33,9 @@ func TestPool_GetNext(t *testing.T) {
 }
 
 func TestPool_HealthCheck(t *testing.T) {
-	u1, _ := url.Parse("http://0.0.0.0:1234")
-	u2, _ := url.Parse("http://0.0.0.0:1235")
-	u3, _ := url.Parse("http://0.0.0.0:1236")
+	u1, _ := url.Parse("http://localhost:1234")
+	u2, _ := url.Parse("http://localhost:1235")
+	u3, _ := url.Parse("http://localhost:1236")
 	s1 := &Server{url: u1}
 	s2 := &Server{url: u2}
 	s3 := &Server{url: u3}
@@ -49,7 +49,7 @@ func TestPool_HealthCheck(t *testing.T) {
 	assert.Equal(t, 0, pool.servers.Len())
 	assert.Equal(t, 3, pool.downServers.Len())
 
-	ln, err := net.Listen("tcp4", ":1234")
+	ln, err := net.Listen("tcp4", "localhost:1234")
 	assert.NoError(t, err)
 
 	pool.HealthCheck()
