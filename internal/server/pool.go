@@ -52,7 +52,7 @@ func (p *Pool) HealthCheck() []string {
 		}
 		p.downServers.PushBack(server)
 		p.servers.Remove(e)
-		msgs = append(msgs, fmt.Sprintf("[%s] down", server.serverURL))
+		msgs = append(msgs, fmt.Sprintf("[%s] down", server.url))
 	}
 	for e := p.downServers.Front(); e != nil; e = next {
 		next = e.Next()
@@ -62,7 +62,7 @@ func (p *Pool) HealthCheck() []string {
 		}
 		p.servers.PushBack(server)
 		p.downServers.Remove(e)
-		msgs = append(msgs, fmt.Sprintf("[%s] up", server.serverURL))
+		msgs = append(msgs, fmt.Sprintf("[%s] up", server.url))
 	}
 	return msgs
 }
