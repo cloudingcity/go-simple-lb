@@ -26,7 +26,11 @@ func (lb *LoadBalancer) Add(u *url.URL) {
 }
 
 func (lb *LoadBalancer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	lb.serverPool.GetNext().ServeHTTP(w, req)
+	if next := lb.serverPool.GetNext(); next != nil {
+		next.ServeHTTP(w, req)
+		return
+	}
+	http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
 }
 
 func (lb *LoadBalancer) HeathCheck(d time.Duration) {
