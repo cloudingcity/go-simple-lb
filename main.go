@@ -23,6 +23,11 @@ func main() {
 		log.Fatal("Please provide one or more servers to load balance")
 	}
 
+	log.SetFormatter(&log.TextFormatter{
+		FullTimestamp:   true,
+		TimestampFormat: "2006-01-02 03:04:05",
+	})
+
 	lb := proxy.NewLB()
 	for _, serverURL := range flagURL.URLs {
 		lb.Add(serverURL)
