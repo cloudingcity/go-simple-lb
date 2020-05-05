@@ -2,8 +2,10 @@ package server
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,4 +27,16 @@ func TestServer_ServeHTTP(t *testing.T) {
 	want := "hello"
 	got := r.Body.String()
 	assert.Equal(t, want, got)
+}
+
+func TestServer_IsAlive(t *testing.T) {
+	ln, err := net.Listen("tcp4", ":1234")
+	assert.NoError(t, err)
+
+	u, _ := url.Parse("http://0.0.0.0:1234")
+	server := &Server{URL: u}
+	assert.True(t, server.IsAlive())
+
+	ln.Close()
+	assert.False(t, server.IsAlive())
 }
