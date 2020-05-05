@@ -14,7 +14,7 @@ var (
 	port    int
 )
 
-func main() {
+func init() {
 	flag.Var(&flagURL, "servers", "Use commas to separate")
 	flag.IntVar(&port, "port", 8080, "Port to serve")
 	flag.Parse()
@@ -27,7 +27,9 @@ func main() {
 		FullTimestamp:   true,
 		TimestampFormat: "2006-01-02 03:04:05",
 	})
+}
 
+func main() {
 	lb := proxy.NewLB()
 	for _, serverURL := range flagURL.URLs {
 		lb.Add(serverURL)
