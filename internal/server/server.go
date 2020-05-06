@@ -7,20 +7,20 @@ import (
 	"time"
 )
 
-type Server struct {
+type server struct {
 	url     *url.URL
 	handler http.Handler
 }
 
-func NewServer(u *url.URL, handler http.Handler) *Server {
-	return &Server{url: u, handler: handler}
+func newServer(u *url.URL, handler http.Handler) *server {
+	return &server{url: u, handler: handler}
 }
 
-func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (s *server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	s.handler.ServeHTTP(rw, req)
 }
 
-func (s *Server) IsAlive() bool {
+func (s *server) IsAlive() bool {
 	_, err := net.DialTimeout("tcp", s.url.Host, 1*time.Second)
 	return err == nil
 }

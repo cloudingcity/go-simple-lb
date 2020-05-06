@@ -18,7 +18,7 @@ func (m *mockHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 }
 
 func TestServer_ServeHTTP(t *testing.T) {
-	s := &Server{
+	s := &server{
 		handler: &mockHandler{},
 	}
 	r := httptest.NewRecorder()
@@ -34,7 +34,7 @@ func TestServer_IsAlive(t *testing.T) {
 	assert.NoError(t, err)
 
 	u, _ := url.Parse("http://localhost:1234")
-	server := &Server{url: u}
+	server := &server{url: u}
 	assert.True(t, server.IsAlive())
 
 	ln.Close()

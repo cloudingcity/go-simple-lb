@@ -10,7 +10,7 @@ import (
 )
 
 type Controller struct {
-	servers map[int]*Server
+	servers map[int]*server
 	upIDs   *list.List
 	downIDs *list.List
 	mux     sync.Mutex
@@ -24,16 +24,16 @@ func NewController() *Controller {
 }
 
 func (c *Controller) SetupServers(urls ...*url.URL) {
-	c.servers = make(map[int]*Server, len(urls))
+	c.servers = make(map[int]*server, len(urls))
 
 	for i, u := range urls {
 		id := i + 1
-		c.servers[id] = NewServer(u, c.ServerHTTPHandler(u))
+		c.servers[id] = newServer(u, c.serverHTTPHandler(u))
 		c.upIDs.PushBack(id)
 	}
 }
 
-func (c *Controller) GetNext() *Server {
+func (c *Controller) getNext() *server {
 	id := c.getNextID()
 	if id == 0 {
 		return nil
@@ -53,7 +53,7 @@ func (c *Controller) getNextID() int {
 
 func (c *Controller) HTTPHandler() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		if server := c.GetNext(); server != nil {
+		if server := c.getNext(); server != nil {
 			server.ServeHTTP(rw, req)
 			return
 		}
@@ -61,7 +61,7 @@ func (c *Controller) HTTPHandler() http.Handler {
 	})
 }
 
-func (c *Controller) ServerHTTPHandler(u *url.URL) http.Handler {
+func (c *Controller) serverHTTPHandler(u *url.URL) http.Handler {
 	return httputil.NewSingleHostReverseProxy(u)
 }
 

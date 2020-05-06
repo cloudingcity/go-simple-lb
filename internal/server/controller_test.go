@@ -17,13 +17,13 @@ func TestController_GetNext(t *testing.T) {
 		c := NewController()
 		c.SetupServers(u1, u2, u3)
 
-		assert.Equal(t, u1, c.GetNext().url)
-		assert.Equal(t, u2, c.GetNext().url)
-		assert.Equal(t, u3, c.GetNext().url)
+		assert.Equal(t, u1, c.getNext().url)
+		assert.Equal(t, u2, c.getNext().url)
+		assert.Equal(t, u3, c.getNext().url)
 	})
 	t.Run("failed", func(t *testing.T) {
 		c := NewController()
-		assert.Nil(t, c.GetNext())
+		assert.Nil(t, c.getNext())
 	})
 }
 
