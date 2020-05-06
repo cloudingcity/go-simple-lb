@@ -4,6 +4,8 @@ import (
 	"container/list"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"sync"
 )
 
@@ -21,12 +23,12 @@ func NewController() *Controller {
 	}
 }
 
-func (c *Controller) SetServers(servers []*Server) {
-	c.servers = make(map[int]*Server, len(servers))
+func (c *Controller) SetupServers(urls ...*url.URL) {
+	c.servers = make(map[int]*Server, len(urls))
 
-	for i, server := range servers {
+	for i, u := range urls {
 		id := i + 1
-		c.servers[id] = server
+		c.servers[id] = NewServer(u, c.ServerHTTPHandler(u))
 		c.upIDs.PushBack(id)
 	}
 }
@@ -57,6 +59,10 @@ func (c *Controller) HTTPHandler() http.Handler {
 		}
 		http.Error(rw, "Service unavailable", http.StatusServiceUnavailable)
 	})
+}
+
+func (c *Controller) ServerHTTPHandler(u *url.URL) http.Handler {
+	return httputil.NewSingleHostReverseProxy(u)
 }
 
 func (c *Controller) HealthCheck() []string {

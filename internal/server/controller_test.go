@@ -13,16 +13,13 @@ func TestController_GetNext(t *testing.T) {
 		u1, _ := url.Parse("http://example1.com")
 		u2, _ := url.Parse("http://example2.com")
 		u3, _ := url.Parse("http://example3.com")
-		s1 := &Server{url: u1}
-		s2 := &Server{url: u2}
-		s3 := &Server{url: u3}
 
 		c := NewController()
-		c.SetServers([]*Server{s1, s2, s3})
+		c.SetupServers(u1, u2, u3)
 
-		assert.Equal(t, s1, c.GetNext())
-		assert.Equal(t, s2, c.GetNext())
-		assert.Equal(t, s3, c.GetNext())
+		assert.Equal(t, u1, c.GetNext().url)
+		assert.Equal(t, u2, c.GetNext().url)
+		assert.Equal(t, u3, c.GetNext().url)
 	})
 	t.Run("failed", func(t *testing.T) {
 		c := NewController()
@@ -34,12 +31,9 @@ func TestController_HealthCheck(t *testing.T) {
 	u1, _ := url.Parse("http://localhost:1234")
 	u2, _ := url.Parse("http://localhost:1235")
 	u3, _ := url.Parse("http://localhost:1236")
-	s1 := &Server{url: u1}
-	s2 := &Server{url: u2}
-	s3 := &Server{url: u3}
 
 	c := NewController()
-	c.SetServers([]*Server{s1, s2, s3})
+	c.SetupServers(u1, u2, u3)
 
 	c.HealthCheck()
 	assert.Equal(t, 0, c.upIDs.Len())

@@ -21,13 +21,10 @@ func New() *LoadBalancer {
 }
 
 func (lb *LoadBalancer) Register(urls ...*url.URL) {
-	var servers []*server.Server
-
 	for _, u := range urls {
-		servers = append(servers, server.NewServer(u))
 		log.Printf("Configured server: %s", u)
 	}
-	lb.controller.SetServers(servers)
+	lb.controller.SetupServers(urls...)
 }
 
 func (lb *LoadBalancer) HeathCheck(d time.Duration) {

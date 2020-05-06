@@ -3,7 +3,6 @@ package server
 import (
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"time"
 )
@@ -13,11 +12,8 @@ type Server struct {
 	handler http.Handler
 }
 
-func NewServer(u *url.URL) *Server {
-	return &Server{
-		url:     u,
-		handler: httputil.NewSingleHostReverseProxy(u),
-	}
+func NewServer(u *url.URL, handler http.Handler) *Server {
+	return &Server{url: u, handler: handler}
 }
 
 func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
