@@ -1,4 +1,4 @@
-package proxy
+package lb
 
 import (
 	"fmt"
@@ -11,33 +11,30 @@ import (
 )
 
 type LoadBalancer struct {
-	serverPool *server.Pool
+	controller *server.Controller
 }
 
-func NewLB() *LoadBalancer {
+func New() *LoadBalancer {
 	return &LoadBalancer{
-		serverPool: server.NewPool(),
+		controller: server.NewController(),
 	}
 }
 
-func (lb *LoadBalancer) Add(u *url.URL) {
-	lb.serverPool.Put(server.NewServer(u))
-	log.Printf("Configured server: %s", u)
-}
+func (lb *LoadBalancer) Register(urls ...*url.URL) {
+	var servers []*server.Server
 
-func (lb *LoadBalancer) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	if next := lb.serverPool.GetNext(); next != nil {
-		next.ServeHTTP(w, req)
-		return
+	for _, u := range urls {
+		servers = append(servers, server.NewServer(u))
+		log.Printf("Configured server: %s", u)
 	}
-	http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
+	lb.controller.SetServers(servers)
 }
 
 func (lb *LoadBalancer) HeathCheck(d time.Duration) {
 	t := time.NewTicker(d)
 	for range t.C {
 		log.Println("Health check starting...")
-		msgs := lb.serverPool.HealthCheck()
+		msgs := lb.controller.HealthCheck()
 		for _, msg := range msgs {
 			log.Warn(msg)
 		}
@@ -48,7 +45,7 @@ func (lb *LoadBalancer) HeathCheck(d time.Duration) {
 func (lb *LoadBalancer) Listen(port int) {
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("Started listening on %s\n", addr)
-	if err := http.ListenAndServe(addr, lb); err != nil {
+	if err := http.ListenAndServe(addr, lb.controller.HTTPHandler()); err != nil {
 		log.Fatal(err)
 	}
 }

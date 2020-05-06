@@ -4,7 +4,7 @@ import (
 	"flag"
 	"time"
 
-	"github.com/cloudingcity/go-simple-lb/internal/proxy"
+	"github.com/cloudingcity/go-simple-lb/internal/lb"
 	"github.com/cloudingcity/go-simple-lb/internal/utils"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,10 +30,8 @@ func init() {
 }
 
 func main() {
-	lb := proxy.NewLB()
-	for _, serverURL := range flagURL.URLs {
-		lb.Add(serverURL)
-	}
-	go lb.HeathCheck(1 * time.Minute)
-	lb.Listen(port)
+	l := lb.New()
+	l.Register(flagURL.URLs...)
+	go l.HeathCheck(1 * time.Minute)
+	l.Listen(port)
 }
