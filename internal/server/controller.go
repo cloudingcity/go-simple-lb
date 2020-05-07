@@ -65,13 +65,13 @@ func (c *Controller) HTTPHandler() http.Handler {
 func (c *Controller) serverHTTPHandler(id int, u *url.URL) http.Handler {
 	proxy := httputil.NewSingleHostReverseProxy(u)
 	proxy.ErrorHandler = func(rw http.ResponseWriter, req *http.Request, err error) {
-		c.Down(id)
+		c.down(id)
 		c.HTTPHandler().ServeHTTP(rw, req)
 	}
 	return proxy
 }
 
-func (c *Controller) Down(id int) {
+func (c *Controller) down(id int) {
 	defer c.mux.Unlock()
 	c.mux.Lock()
 

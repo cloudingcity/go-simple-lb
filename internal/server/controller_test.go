@@ -66,7 +66,7 @@ func (suite *ControllerTestSuite) TestDown() {
 	c := NewController()
 	c.SetupServers(suite.u1, suite.u2, suite.u3)
 
-	c.Down(1)
+	c.down(1)
 	suite.Equal(2, c.upIDs.Len())
 	suite.Equal(1, c.downIDs.Len())
 	suite.Contains(suite.out.String(), "[http://localhost:1234] down")
