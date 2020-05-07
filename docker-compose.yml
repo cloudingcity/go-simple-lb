@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  lb:
+    build: .
+    container_name: lb
+    ports:
+      - "8080:8080"
+    command: --servers "http://web1:80,http://web2:80,http://web3:80"
+  web1:
+    image: ghost0436/simple-http
+  web2:
+    image: ghost0436/simple-http
+  web3:
+    image: ghost0436/simple-http

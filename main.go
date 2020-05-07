@@ -24,6 +24,8 @@ func init() {
 	}
 
 	log.SetFormatter(&log.TextFormatter{
+		DisableColors:   false,
+		ForceColors:     true,
 		FullTimestamp:   true,
 		TimestampFormat: "2006-01-02 03:04:05",
 	})
