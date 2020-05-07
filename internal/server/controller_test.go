@@ -1,10 +1,12 @@
 package server
 
 import (
+	"bytes"
 	"net"
 	"net/url"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,6 +30,9 @@ func TestController_GetNext(t *testing.T) {
 }
 
 func TestController_HealthCheck(t *testing.T) {
+	b := &bytes.Buffer{}
+	logrus.SetOutput(b)
+
 	u1, _ := url.Parse("http://localhost:1234")
 	u2, _ := url.Parse("http://localhost:1235")
 	u3, _ := url.Parse("http://localhost:1236")

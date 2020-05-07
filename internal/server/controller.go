@@ -2,11 +2,12 @@ package server
 
 import (
 	"container/list"
-	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Controller struct {
@@ -76,24 +77,20 @@ func (c *Controller) HealthCheck() []string {
 	for e := c.upIDs.Front(); e != nil; e = next {
 		next = e.Next()
 		id := e.Value.(int)
-		server := c.servers[id]
-		if server.IsAlive() {
-			continue
+		if server := c.servers[id]; !server.IsAlive() {
+			c.downIDs.PushBack(id)
+			c.upIDs.Remove(e)
+			log.Warnf("[%s] down", server.url)
 		}
-		c.downIDs.PushBack(id)
-		c.upIDs.Remove(e)
-		msgs = append(msgs, fmt.Sprintf("[%s] down", server.url))
 	}
 	for e := c.downIDs.Front(); e != nil; e = next {
 		next = e.Next()
 		id := e.Value.(int)
-		server := c.servers[id]
-		if !server.IsAlive() {
-			continue
+		if server := c.servers[id]; server.IsAlive() {
+			c.upIDs.PushBack(id)
+			c.downIDs.Remove(e)
+			log.Warnf("[%s] up", server.url)
 		}
-		c.upIDs.PushBack(id)
-		c.downIDs.Remove(e)
-		msgs = append(msgs, fmt.Sprintf("[%s] up", server.url))
 	}
 	return msgs
 }

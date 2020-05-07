@@ -31,10 +31,7 @@ func (lb *LoadBalancer) HeathCheck(d time.Duration) {
 	t := time.NewTicker(d)
 	for range t.C {
 		log.Println("Health check starting...")
-		msgs := lb.controller.HealthCheck()
-		for _, msg := range msgs {
-			log.Warn(msg)
-		}
+		lb.controller.HealthCheck()
 		log.Println("Health check completed")
 	}
 }
