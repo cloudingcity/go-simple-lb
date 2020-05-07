@@ -29,7 +29,7 @@ func (c *Controller) SetupServers(urls ...*url.URL) {
 
 	for i, u := range urls {
 		id := i + 1
-		c.servers[id] = newServer(u, c.serverHTTPHandler(u))
+		c.servers[id] = newServer(u, c.serverHTTPHandler(id, u))
 		c.upIDs.PushBack(id)
 	}
 }
@@ -62,8 +62,27 @@ func (c *Controller) HTTPHandler() http.Handler {
 	})
 }
 
-func (c *Controller) serverHTTPHandler(u *url.URL) http.Handler {
-	return httputil.NewSingleHostReverseProxy(u)
+func (c *Controller) serverHTTPHandler(id int, u *url.URL) http.Handler {
+	proxy := httputil.NewSingleHostReverseProxy(u)
+	proxy.ErrorHandler = func(rw http.ResponseWriter, req *http.Request, err error) {
+		c.Down(id)
+		c.HTTPHandler().ServeHTTP(rw, req)
+	}
+	return proxy
+}
+
+func (c *Controller) Down(id int) {
+	defer c.mux.Unlock()
+	c.mux.Lock()
+
+	c.downIDs.PushBack(id)
+	for e := c.upIDs.Front(); e != nil; e = e.Next() {
+		if upID := e.Value.(int); upID == id {
+			c.upIDs.Remove(e)
+			break
+		}
+	}
+	log.Warnf("[%s] down", c.servers[id].url)
 }
 
 func (c *Controller) HealthCheck() []string {

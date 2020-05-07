@@ -53,3 +53,20 @@ func TestController_HealthCheck(t *testing.T) {
 
 	ln.Close()
 }
+
+func TestController_Down(t *testing.T) {
+	b := &bytes.Buffer{}
+	logrus.SetOutput(b)
+
+	u1, _ := url.Parse("http://localhost:1234")
+	u2, _ := url.Parse("http://localhost:1235")
+	u3, _ := url.Parse("http://localhost:1236")
+
+	c := NewController()
+	c.SetupServers(u1, u2, u3)
+
+	c.Down(1)
+	assert.Equal(t, 2, c.upIDs.Len())
+	assert.Equal(t, 1, c.downIDs.Len())
+	assert.Contains(t, b.String(), "[http://localhost:1234] down")
+}
